@@ -54,6 +54,8 @@ int main(int argc, char* argv[]) {
 	bind(sListen, (SOCKADDR*)&addr, sizeof(addr));
 	listen(sListen, SOMAXCONN);
 
+	cout << "Server started at " << ip << ":" << port << endl << "Waiting for clients..." << endl;
+
 	SOCKET newConnection;
 	for (int i = 0; i < 2; i++) {
 		newConnection = accept(sListen, (SOCKADDR*)&addr, &sizeofaddr);
@@ -62,18 +64,30 @@ int main(int argc, char* argv[]) {
 			cout << "Error: can't connect client" << endl;
 		}
 		else {
-			cout << "Client Connected!" << endl;
+			cout << "Player " << i+1 << " Connected!" << endl;
 
 			Connections[i] = newConnection;
 			Counter++;
-			if(Counter == 1) {
-				send(Connections[i], (char*)0xC2C, sizeof(int), NULL);
-			}
 			CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)ClientHandler, (LPVOID)(i), NULL, NULL);
 		}
 	}
 
+	cout << "All players connected. Starting game..." << endl;
 
-	system("pause");
+	string com;
+	while (true) {
+		cout << ">> ";
+		cin >> com;
+
+		if (com == "stop" || com == "exit") {
+			return 0;
+		} else if (com == "ip") {
+			cout << "Server ip is " << ip << endl;
+		} else if (com == "port") {
+			cout << "Server port is " << port << endl;
+		} else {
+			cout << "Incorrect or unexisting command!" << endl;
+		}
+	}
 	return 0;
 }
